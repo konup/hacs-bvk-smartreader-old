@@ -1,0 +1,3 @@
+"""
+The BVK SmartReader integration.
+"""

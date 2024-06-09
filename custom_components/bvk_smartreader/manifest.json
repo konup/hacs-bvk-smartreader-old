@@ -1,0 +1,11 @@
+{
+  "domain": "bvk_smartreader",
+  "name": "BVK SmartReader",
+  "version": "1.0.0",
+  "documentation": "https://gitlab.com/nastole/hassio/hacs/bvk-smartreader",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": ["@konup"],
+  "iot_class": "local_polling",
+  "icon": "custom_components/bvk_smartreader/icon.png"
+}
