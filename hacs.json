@@ -1,10 +1,6 @@
 {
   "name": "BVK SmartReader",
-  "content_in_root": false,
-  "zip_release": false,
-  "homeassistant": "2021.1.5",
-  "domains": ["sensor"],
-  "country": ["CZ"],
-  "persistent_directory": "userfiles",
-  "render_readme": true
+  "persistent_directory": "data",
+  "render_readme": true,
+  "homeassistant": "2021.1.5"
 }

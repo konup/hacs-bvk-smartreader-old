@@ -39,8 +39,8 @@ class WaterMeterSensor(Entity):
         try:
             result = subprocess.run(
                 ['./custom_components/bvk_smartreader/getBvkSuezData.sh', self._username, self._password],
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.PIPE, 
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 check=True
             )
             self._state = result.stdout.decode('utf-8').strip()
