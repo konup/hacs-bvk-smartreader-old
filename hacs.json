@@ -1,15 +1,10 @@
 {
   "name": "BVK SmartReader",
   "content_in_root": false,
-  "country": "cz",
-  "domain": "bvk_smartreader",
-  "homeassistant": "2021.6.0",
-  "render_readme": true,
   "zip_release": false,
-  "filename": "custom_components/bvk_smartreader",
-  "manifest": "custom_components/bvk_smartreader/manifest.json",
-  "icon": "custom_components/bvk_smartreader/icon.png",
-  "releases": true,
-  "persistent_directory": "custom_components/bvk_smartreader",
-  "config_flow": false
+  "homeassistant": "2021.1.5",
+  "domains": ["sensor"],
+  "country": ["CZ"],
+  "persistent_directory": "userfiles",
+  "render_readme": true
 }
