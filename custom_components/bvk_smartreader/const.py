@@ -1,0 +1,2 @@
+DOMAIN = "bvk_smartreader"
+
