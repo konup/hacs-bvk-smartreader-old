@@ -1,49 +1,44 @@
 import subprocess
-import logging
 from homeassistant.helpers.entity import Entity
 
-_LOGGER = logging.getLogger(__name__)
+from .const import DOMAIN
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
-    """Set up the BVK SmartReader sensor."""
-    username = config.get("username")
-    password = config.get("password")
-
-    if username is None or password is None:
-        _LOGGER.error("Username and password must be set in the configuration")
-        return
-
-    add_entities([WaterMeterSensor(username, password)])
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up BVK Smart Reader sensor platform."""
+    async_add_entities([WaterMeterSensor(hass.data[DOMAIN])])
 
 class WaterMeterSensor(Entity):
-    """Representation of a BVK SmartReader sensor."""
+    """Representation of a Water Meter sensor."""
 
-    def __init__(self, username, password):
-        """Initialize the sensor."""
+    def __init__(self, config):
+        self._config = config
         self._state = None
-        self._username = username
-        self._password = password
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return 'Water Meter'
+        return "Water Meter"
 
     @property
     def state(self):
         """Return the state of the sensor."""
         return self._state
 
-    def update(self):
+    async def async_update(self):
         """Fetch new state data for the sensor."""
+        username = self._config["username"]
+        password = self._config["password"]
+        script_path = './custom_components/bvk_smartreader/getBvkSuezData.sh'
+
         try:
             result = subprocess.run(
-                ['./custom_components/bvk_smartreader/getBvkSuezData.sh', self._username, self._password], 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.PIPE, 
+                [script_path, username, password],
+                capture_output=True,
+                text=True,
                 check=True
             )
-            self._state = result.stdout.decode('utf-8').strip()
+            self._state = result.stdout.strip()  # Get the output from the script
         except subprocess.CalledProcessError as e:
-            _LOGGER.error(f"Error fetching data from BVK SmartReader: {e.stderr.decode('utf-8')}")
             self._state = None
+            # Log error or handle as needed
+            self._state = f"Error: {e}"
