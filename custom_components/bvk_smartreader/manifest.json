@@ -1,10 +1,12 @@
 {
   "domain": "bvk_smartreader",
   "name": "BVK SmartReader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "documentation": "https://gitlab.com/nastole/hassio/hacs/bvk-smartreader",
-  "iot_class": "local_polling",
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
   "requirements": [],
   "dependencies": [],
+  "config_flow": true,
   "codeowners": ["@konup"]
 }
