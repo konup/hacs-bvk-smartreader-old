@@ -25,8 +25,16 @@ class BVKSmartReaderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title="BVK SmartReader", data=user_input)
 
         data_schema = vol.Schema({
-            vol.Required("username"): str,
-            vol.Required("password"): str,
+            vol.Required("username", description={"suggested_value": "Enter your username"}): str,
+            vol.Required("password", description={"suggested_value": "Enter your password"}): str,
         })
 
-        return self.async_show_form(step_id="user", data_schema=data_schema, errors=errors)
+        return self.async_show_form(
+            step_id="user",
+            data_schema=data_schema,
+            errors=errors,
+            description_placeholders={
+                "username": "Enter your zis.bvk.cz username",
+                "password": "Enter your zis.bvk.cz password"
+            }
+        )
