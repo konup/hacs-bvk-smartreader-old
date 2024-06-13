@@ -1,5 +1,9 @@
 #!/bin/bash
 
+verboseMode=$3
+
+[ "$verboseMode" == "1" ] || [ "$verboseMode" == "true" ] || [ "$verboseMode" == "enabled" ] && debug="1" || debug="0"
+
 [ "$1" == "" ] && [ "$2" == "" ] && [ ! -f ".credentials" ] && { echo "STOP: bvkUser and bvkpassword missing and also .credentials file not found"; exit 1; }
 
 [ "$1" != "" ] && [ "$2" != "" ] && {
@@ -12,6 +16,9 @@ bvkUrl="https://zis.bvk.cz"
 [ "$bvkUrl"      == "" ] && { echo "STOP: bvkUrl missing"; exit 1; }
 [ "$bvkUser"     == "" ] && { echo "STOP: bvkUser missing"; exit 1; }
 [ "$bvkPassword" == "" ] && { echo "STOP: bvkPassword missing"; exit 1; }
+
+[ $debug -ne 0 ] && echo bvkUrl=$bvkUrl
+[ $debug -ne 0 ] && echo bvkUser=$bvkUser
 
 rm -f ./response-*.html
 rm -f ./cookie-*.txt
@@ -163,6 +170,7 @@ bvkCustomerID=`cat response-05.html | grep ctl00_ctl00_ContentPlaceHolder1Common
 bvkRowID=0
 
 [ "$bvkCustomerID" == "" ] && { echo "STOP: bvkCustomerID missing"; exit 1; }
+[ $debug -ne 0 ] && echo bvkCustomerID=$bvkCustomerID
 
 curl -X POST \
 $curlParm \
@@ -214,6 +222,26 @@ $curlParm \
 rCode=$?
 [ $rCode -ne 0 ] && { echo "STOP: get PLACE-PLACE failed"; exit 1; }
 
+getBvkPlaceValue()
+{
+  cat response-07.html | sed 's/></>\n</g' | grep "$1\"" | sed "s/$1//" | sed 's/<\/span>//' | sed 's/<input name=.*type="text"//' | sed 's/<span .*>//' | sed 's/.*value="//' | sed 's/".*//' | sed 's/^[[:space:]]*//'
+}
+
+edLoggedInUserName=`cat response-07.html | grep LoggedInUserName | sed 's/.*LoggedInUserName">\(.*\)<\/span>.*/\1/'`
+edConthNo=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_edConthNo`
+edContValidity=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_edContValidity`
+edPartnerSurname=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_edPartnerSurname`
+edPartnerFirstName=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_edPartnerFirstName`
+edPartnerTitle=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_edPartnerTitle`
+edPartnerIdentification1=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_EdPartnerIdentification1`
+edCpId=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_edCpId`
+edCpEvNum=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_edCpEvNum`
+edCity=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_AddressCpWater_edCity`
+edCityPart=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_AddressCpWater_edCityPart`
+edStreet=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_AddressCpWater_edStreet`
+edHouseNum=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_AddressCpWater_edHouseNum`
+edStreetNum=`getBvkPlaceValue ctl00_ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_UserDataContentPlaceHolder_AddressCpWater_edStreetNum`
+
 
 ###
 ### 11 get SUEZ-VALUES
@@ -242,12 +270,36 @@ suezID=`cat response-11.html | grep ctl00_PHTitre_LabelTitreSite | sed 's/.*ctl0
 [ "$suezID" == "" ]    && { echo "STOP: suezID missing"; exit 1; }
 
 
+# own convert date because bysybox does not support AM/PM
+input_date="${suezDateS}"
+month=$(echo $input_date | cut -d'/' -f1)
+day=$(echo $input_date | cut -d'/' -f2 | cut -d' ' -f1)
+year=$(echo $input_date | cut -d'/' -f3 | cut -d' ' -f1)
+time=$(echo $input_date | cut -d' ' -f2)
+period=$(echo $input_date | cut -d' ' -f3)
+hour=$(echo $time | cut -d':' -f1)
+minute=$(echo $time | cut -d':' -f2)
+if [ "$period" = "PM" ] && [ "$hour" -ne 12 ]; then
+    hour=$((hour + 12))
+elif [ "$period" = "AM" ] && [ "$hour" -eq 12 ]; then
+    hour=0
+fi
+formatted_time=$(printf "%02d:%02d" $hour $minute)
+formatted_date=$(printf "%04d-%02d-%02d %s" $year $month $day $formatted_time)
+suezDate="${formatted_date}"
+
 ###
 ### 99 end
 ###
 
 rm -f ./response-*.html
 rm -f ./cookie-*.txt
+
+[ $debug -ne 0 ] && echo "suezID=$suezID"
+[ $debug -ne 0 ] && echo "suezDate=$suezDate"
+[ $debug -ne 0 ] && echo "suezValue=$suezValue"
+
+# echo "{ \"suezid\": \"$suezID\", \"date\": \"$suezDate\", \"value\": \"$suezValue\" }"
 
 echo "$suezValue"
 
