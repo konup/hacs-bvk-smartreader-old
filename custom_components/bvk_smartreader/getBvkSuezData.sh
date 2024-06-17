@@ -18,17 +18,18 @@ elog()
 
 elog "begin"
 
-elog "$(pwd)"
+elog "workDirectory=$(pwd)"
 
 [ "$1" == "" ] && [ "$2" == "" ] && [ ! -f ".credentials" ] && { echo "STOP: bvkUser and bvkpassword missing and also .credentials file not found"; exit 1; }
 
 [ "$1" != "" ] && [ "$2" != "" ] && {
   bvkUser="$1"
   bvkPassword="$2"
-  elog "apply credentials from command line arguments ( bvkUser=bvkUser, bvkPassword=***** )"
-} || {
-. .credentials
-  elog "apply credentials from .credentials file ( bvkUser=bvkUser, bvkPassword=***** )"
+  elog "apply credentials from command line arguments ( bvkUser=${bvkUser}, bvkPassword=***** )"
+}
+[ "$1" == "" ] && [ "$2" == "" ] && {
+  . .credentials
+  elog "apply credentials from .credentials file ( bvkUser=${bvkUser}, bvkPassword=***** )"
 }
 
 bvkUrl="https://zis.bvk.cz"
@@ -36,6 +37,8 @@ bvkUrl="https://zis.bvk.cz"
 [ "$bvkUrl"      == "" ] && { echo "STOP: bvkUrl missing"; exit 1; }
 [ "$bvkUser"     == "" ] && { echo "STOP: bvkUser missing"; exit 1; }
 [ "$bvkPassword" == "" ] && { echo "STOP: bvkPassword missing"; exit 1; }
+
+elog "bvkUser=${bvkUser} ; bvkUrl=${bvkUrl}"
 
 rm -f ./response-*.html
 rm -f ./cookie-*.txt
@@ -269,6 +272,8 @@ suezUrl="https://cz-sitr.suezsmartsolutions.com/eMIS.SE_BVK/Login.aspx?token=$su
 [ "$suezToken" == "" ] && { echo "STOP: suezToken missing"; exit 1; }
 [ "$suezUrl"   == "" ] && { echo "STOP: suezUrl missing"; exit 1; }
 
+elog "suezUrl=${suezUrl} ; suezToken=${suezToken}"
+
 curl -X GET \
 $curlParm \
 -o response-11.html \
@@ -285,6 +290,8 @@ suezID=`cat response-11.html | grep ctl00_PHTitre_LabelTitreSite | sed 's/.*ctl0
 [ "$suezDateS" == "" ] && { echo "STOP: suezDateS missing"; exit 1; }
 [ "$suezID" == "" ]    && { echo "STOP: suezID missing"; exit 1; }
 
+elog "suezID=${suezID} ; suezDateS=${suezDateS} ; suezValue=${suezValue}"
+
 
 ###
 ### 99 end
@@ -295,9 +302,10 @@ elog "99 end"
 rm -f ./response-*.html
 rm -f ./cookie-*.txt
 
+elog "echo suezValue=${suezValue}"
 echo "$suezValue"
 
-log "finish"
+elog "finish"
 
 exit 0
 
