@@ -2,7 +2,7 @@
   "name": "BVK SmartReader",
   "iot_class": "Cloud Polling",
   "homeassistant": "2023.3.0",
-  "persistent_directory": "data",
+  "persistent_directory": "userfiles",
   "render_readme": true,
   "hide_default_branch": true,
   "zip_release": false,

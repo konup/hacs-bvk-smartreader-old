@@ -1,11 +1,35 @@
 #!/bin/bash
 
+verboseMode=$3
+[ "$verboseMode" == "1" ] || [ "$verboseMode" == "true" ] || [ "$verboseMode" == "enabled" ] && debug="1" || debug="0"
+cd custom_components/bvk_smartreader
+
+elog()
+{
+
+  DAT=`date "+%F %T"`
+  TXT="$1"
+  [ "$2" == "" ] && LEVEL="INFO" || LEVEL="$2"
+  [ "$debug" == "1" ] && echo "[$DAT] $LEVEL $0 ${TXT}"
+  [ "$LOGF" == "" ] && export LOGF="getBvkSuezData.log"
+  echo "[$DAT] $LEVEL $0 ${TXT}" >> $LOGF
+  [ "$3" != "" ] && { elog "STOP"; exit $3; }
+}
+
+elog "begin"
+
+elog "$(pwd)"
+
 [ "$1" == "" ] && [ "$2" == "" ] && [ ! -f ".credentials" ] && { echo "STOP: bvkUser and bvkpassword missing and also .credentials file not found"; exit 1; }
 
 [ "$1" != "" ] && [ "$2" != "" ] && {
   bvkUser="$1"
   bvkPassword="$2"
-} || . .credentials
+  elog "apply credentials from command line arguments ( bvkUser=bvkUser, bvkPassword=***** )"
+} || {
+. .credentials
+  elog "apply credentials from .credentials file ( bvkUser=bvkUser, bvkPassword=***** )"
+}
 
 bvkUrl="https://zis.bvk.cz"
 
@@ -36,6 +60,8 @@ setDotNetEnvFrom()
 ### 01 HOMEPAGE
 ###
 
+elog "01 HOMEPAGE"
+
 curl -X GET \
 $curlParm \
 -c cookie-01.txt \
@@ -51,6 +77,8 @@ rCode=$?
 ###
 ### 02 LOGIN
 ###
+
+elog "02 LOGIN"
 
 setDotNetEnvFrom response-01.html
 
@@ -89,6 +117,8 @@ rCode=$?
 ### 03 LOGIN-REDIR
 ###
 
+elog "03 LOGIN-REDIR"
+
 curl -X GET \
 $curlParm \
 -o response-03.html \
@@ -106,6 +136,8 @@ rCode=$?
 ###
 ### 04 LIST
 ###
+
+elog "04 LIST"
 
 setDotNetEnvFrom response-03.html
 
@@ -135,10 +167,16 @@ $curlParm \
 rCode=$?
 [ $rCode -ne 0 ] && { echo "STOP: get LIST failed"; exit 1; }
 
+RES=`grep "0|error|500" response-04.html`
+[ "$RES" != "" ] && { echo "STOP: get LIST failed - 500"; exit 1; }
+RES=`grep "pageRedirect" response-04.html`
+[ "$RES" == "" ] && { echo "STOP: get LIST failed - pageRedirect"; exit 1; }
 
 ###
 ### 05 LIST-REDIR
 ###
+
+elog "05 LIST-REDIT"
 
 curl -X GET \
 $curlParm \
@@ -157,6 +195,8 @@ rCode=$?
 ###
 ### 06 PLACE
 ###
+
+elog "06 PLACE"
 
 setDotNetEnvFrom response-05.html
 bvkCustomerID=`cat response-05.html | grep ctl00_ctl00_ContentPlaceHolder1Common_ContentPlaceHolder1_hfCA | sed 's/.*value="\([0-9]*\)".*/\1/'`
@@ -201,6 +241,8 @@ rCode=$?
 ### 07 PLACE-REDIR
 ###
 
+elog "07 PLACE-REDIR"
+
 curl -X GET \
 $curlParm \
 -o response-07.html \
@@ -218,6 +260,8 @@ rCode=$?
 ###
 ### 11 get SUEZ-VALUES
 ###
+
+elog "11 SUEZ-VALUES"
 
 suezToken=`cat response-07.html | grep "https://cz-sitr.suezsmartsolutions.com/eMIS.SE_BVK/Login.aspx?token" | sed 's/.*token=\(.*\)&amp;.*/\1/'`
 suezUrl="https://cz-sitr.suezsmartsolutions.com/eMIS.SE_BVK/Login.aspx?token=$suezToken&amp;langue=en-GB"
@@ -246,10 +290,14 @@ suezID=`cat response-11.html | grep ctl00_PHTitre_LabelTitreSite | sed 's/.*ctl0
 ### 99 end
 ###
 
+elog "99 end"
+
 rm -f ./response-*.html
 rm -f ./cookie-*.txt
 
 echo "$suezValue"
+
+log "finish"
 
 exit 0
 
