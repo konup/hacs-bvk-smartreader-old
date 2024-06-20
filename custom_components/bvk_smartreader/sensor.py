@@ -49,7 +49,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     days = 1  # Default value or load from entry if set
 
     water_consumption_sensor = WaterConsumptionSensor(hass, username, password, days)
-    
+
     async_add_entities([water_consumption_sensor], True)
 
 class WaterDataSensor(Entity):
@@ -67,7 +67,8 @@ class WaterDataSensor(Entity):
 
     @property
     def name(self):
-        return f"Water Data Sensor {self.username} {self.days}"
+        #return f"Water Data Sensor {self.username} {self.days}"
+        return f"Water Data Sensor"
 
     @property
     def state(self):
