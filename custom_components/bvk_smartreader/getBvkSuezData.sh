@@ -303,7 +303,9 @@ rm -f ./response-*.html
 rm -f ./cookie-*.txt
 
 elog "echo suezValue=${suezValue}"
-echo "$suezValue"
+
+#echo "$suezValue"
+echo "[ { \"value\": $suezValue } ]"
 
 elog "finish"
 
