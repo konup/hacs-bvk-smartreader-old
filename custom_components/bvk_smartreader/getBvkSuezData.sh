@@ -11,7 +11,7 @@ elog()
   TXT="$1"
   [ "$2" == "" ] && LEVEL="INFO" || LEVEL="$2"
   [ "$debug" == "1" ] && echo "[$DAT] $LEVEL $0 ${TXT}"
-  [ "$LOGF" == "" ] && export LOGF="getBvkSuezData.log"
+  [ "$LOGF" == "" ] && export LOGF="logs/getBvkSuezData.log"
   echo "[$DAT] $LEVEL $0 ${TXT}" >> $LOGF
   [ "$3" != "" ] && { elog "STOP"; exit $3; }
 }
