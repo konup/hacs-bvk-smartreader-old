@@ -37,7 +37,8 @@ formatter = logging.Formatter('%(message)s')
 file_handler.setFormatter(formatter)
 _LOGGER.addHandler(file_handler)
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=15)
+#MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=15)
+MIN_TIME_BETWEEN_UPDATES = timedelta(hours=8)
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     pass
