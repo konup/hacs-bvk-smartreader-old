@@ -10,7 +10,7 @@ from homeassistant.const import UnitOfVolume
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 from homeassistant.core import HomeAssistant
-from .const import DOMAIN, CONF_USERNAME, CONF_PASSWORD
+from .const import DOMAIN, CONF_USERNAME, CONF_PASSWORD, CONF_UPDATE_INTERVAL
 
 # Ensure the logs directory exists
 os.makedirs('./custom_components/bvk_smartreader/logs', exist_ok=True)
@@ -36,32 +36,34 @@ formatter = logging.Formatter('%(message)s')
 file_handler.setFormatter(formatter)
 _LOGGER.addHandler(file_handler)
 
-#MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=15)
-MIN_TIME_BETWEEN_UPDATES = timedelta(hours=8)
-
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     pass
 
 async def async_setup_entry(hass, entry, async_add_entities):
     username = entry.data[CONF_USERNAME]
     password = entry.data[CONF_PASSWORD]
+    update_interval = entry.data.get(CONF_UPDATE_INTERVAL, 8)
     days = 1  # Default value or load from entry if set
 
-    water_consumption_sensor = WaterConsumptionSensor(hass, username, password, days)
+    water_consumption_sensor = WaterConsumptionSensor(hass, username, password, days, update_interval)
 
     async_add_entities([water_consumption_sensor], True)
 
 class WaterDataSensor(Entity):
-    def __init__(self, hass, username, password, days):
+    def __init__(self, hass, username, password, days, update_interval):
         self.hass = hass
         self.username = username
         self.password = password
         self.days = days
+        self.update_interval = timedelta(hours=update_interval)
         self._state = None
         self._attributes = {}
-        self._unique_id = f"bvk_smartreader_{username}_{days}"
-        self.entity_id = f"sensor.bvk_smartreader_{username}_{days}"
+        #self._unique_id = f"bvk_smartreader_{username}_{days}"
+        #self.entity_id = f"sensor.bvk_smartreader_{username}_{days}"
+        self._unique_id = f"bvk_smartreader"
+        self.entity_id = f"sensor.bvk_smartreader"
         _LOGGER.debug(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.CYAN}Initialized WaterDataSensor with Username: {self.username}{Colors.RESET}")
+        self.update = Throttle(self.update_interval)(self.update)
         self.update()
 
     @property
@@ -81,7 +83,6 @@ class WaterDataSensor(Entity):
     def extra_state_attributes(self):
         return self._attributes
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self, no_throttle=False):
         if not self.username:
             _LOGGER.warning(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.RED}Username is not set. Skipping update.{Colors.RESET}")
@@ -113,15 +114,16 @@ class WaterDataSensor(Entity):
             total_value = sum(item['value'] for item in data)
             self._state = total_value
             self._attributes = {
-                'data': data
+                'data': data,
+                'last_update': dt.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             _LOGGER.debug(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.CYAN}Total value: {total_value}{Colors.RESET}")
         except Exception as e:
             _LOGGER.error(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.RED}Error retrieving data: {e}{Colors.RESET}")
 
 class WaterConsumptionSensor(WaterDataSensor):
-    def __init__(self, hass, username, password, days):
-        super().__init__(hass, username, password, days)
+    def __init__(self, hass, username, password, days, update_interval):
+        super().__init__(hass, username, password, days, update_interval)
 
     @property
     def unit_of_measurement(self):
