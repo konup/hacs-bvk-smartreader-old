@@ -2,7 +2,7 @@
 
 ![Logo](custom_components/bvk_smartreader/icon.png)
 
-![Version](https://img.shields.io/badge/version-1.0.26-blue)
+![Version](https://img.shields.io/badge/version-1.0.27-blue)
 
 ## How to use
 
