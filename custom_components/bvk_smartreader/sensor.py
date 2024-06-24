@@ -6,7 +6,7 @@ import os
 from datetime import timedelta
 from datetime import datetime as dt
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorDeviceClass
-from homeassistant.const import UnitOfVolume, DEVICE_CLASS_WATER, STATE_CLASS_MEASUREMENT
+from homeassistant.const import UnitOfVolume, STATE_CLASS_MEASUREMENT
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 from homeassistant.core import HomeAssistant
@@ -17,7 +17,7 @@ os.makedirs('./custom_components/bvk_smartreader/logs', exist_ok=True)
 
 # ANSI escape codes for colored text
 class Colors:
-    RED = 'ERROR ' 
+    RED = 'ERROR '
     GREEN = 'SUCCESS '
     YELLOW = '\033[33m'
     BLUE = '\033[34m'
@@ -87,7 +87,7 @@ class WaterDataSensor(Entity):
 
     @property
     def device_class(self):
-        return DEVICE_CLASS_WATER
+        return SensorDeviceClass.WATER
 
     @property
     def state_class(self):
@@ -141,7 +141,7 @@ class WaterConsumptionSensor(WaterDataSensor):
 
     @property
     def device_class(self):
-        return DEVICE_CLASS_WATER
+        return SensorDeviceClass.WATER
 
     @property
     def state_class(self):
