@@ -1,7 +1,6 @@
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
-from homeassistant.helpers import selector
 from .const import DOMAIN, CONF_USERNAME, CONF_PASSWORD, CONF_UPDATE_INTERVAL
 from .version import VERSION
 
@@ -21,6 +20,9 @@ class BvkSmartReaderConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_UPDATE_INTERVAL, default=8): vol.All(vol.Coerce(int), vol.Range(min=1))
             }),
             description_placeholders={
+                "username_description": "Zadejte své uživatelské jméno pro BVK účet",
+                "password_description": "Zadejte své heslo pro BVK účet",
+                "update_interval_description": "Zadejte interval aktualizace v hodinách (minimálně 1 hodina)",
                 "version": VERSION
             }
         )
@@ -46,6 +48,9 @@ class BvkSmartReaderOptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Required(CONF_UPDATE_INTERVAL, default=self.config_entry.data.get(CONF_UPDATE_INTERVAL, 8)): vol.All(vol.Coerce(int), vol.Range(min=1))
             }),
             description_placeholders={
+                "username_description": "Zadejte své uživatelské jméno pro BVK účet",
+                "password_description": "Zadejte své heslo pro BVK účet",
+                "update_interval_description": "Zadejte interval aktualizace v hodinách (minimálně 1 hodina)",
                 "version": VERSION
             }
         )

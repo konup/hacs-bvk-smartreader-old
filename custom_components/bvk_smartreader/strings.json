@@ -1,24 +1,17 @@
 {
   "config": {
-    "title": "BVK Smart Reader",
-    "version": "Verze: {version}",
     "step": {
       "user": {
-        "title": "Připojte svůj účet BVK",
-        "description": "Zadejte své uživatelské jméno a heslo BVK.",
         "data": {
           "username": "Uživatelské jméno",
           "password": "Heslo",
-          "update_interval": "Interval aktualizace (v hodinách)"
-        }
-      },
-      "init": {
-        "title": "Nastavení integrace BVK Smart Reader",
-        "description": "Upravte nastavení integrace.",
-        "data": {
-          "username": "Uživatelské jméno",
-          "password": "Heslo",
-          "update_interval": "Interval aktualizace (v hodinách)"
+          "update_interval": "Interval aktualizace"
+        },
+        "description": {
+          "username_description": "Zadejte své uživatelské jméno pro BVK účet",
+          "password_description": "Zadejte své heslo pro BVK účet",
+          "update_interval_description": "Zadejte interval aktualizace v hodinách (minimálně 1 hodina)",
+          "version": "Verze integrace: {version}"
         }
       }
     }
