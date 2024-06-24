@@ -5,16 +5,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
-from .version import VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup(hass: HomeAssistant, config: dict):
-    _LOGGER.info(f"Setting up BVK Smart Reader integration version {VERSION}")
     return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
-    _LOGGER.info(f"Setting up BVK Smart Reader entry version {VERSION}")
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = entry.data
 
