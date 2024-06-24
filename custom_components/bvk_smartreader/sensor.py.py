@@ -3,7 +3,8 @@ import subprocess
 import json
 import datetime
 import os
-from datetime import timedelta, datetime as dt
+from datetime import timedelta
+from datetime import datetime as dt
 from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorDeviceClass, SensorStateClass
 from homeassistant.const import UnitOfVolume
 from homeassistant.helpers.entity import Entity
@@ -61,7 +62,6 @@ class WaterDataSensor(Entity):
         #self.entity_id = f"sensor.bvk_smartreader_{username}_{days}"
         self._unique_id = f"bvk_smartreader"
         self.entity_id = f"sensor.bvk_smartreader"
-        self._last_reset = None
         _LOGGER.debug(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.CYAN}Initialized WaterDataSensor with Username: {self.username}{Colors.RESET}")
         self.update = Throttle(self.update_interval)(self.update)
         self.update()
@@ -133,7 +133,6 @@ class WaterDataSensor(Entity):
                 'data': data,
                 'last_update': dt.now().strftime("%Y-%m-%d %H:%M:%S")
             }
-            self._last_reset = dt.now().replace(hour=0, minute=0, second=0, microsecond=0)
             _LOGGER.debug(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.CYAN}Total value: {total_value}{Colors.RESET}")
         except Exception as e:
             _LOGGER.error(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.RED}Error retrieving data: {e}{Colors.RESET}")
