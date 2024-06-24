@@ -99,6 +99,10 @@ class WaterDataSensor(Entity):
     def last_reset(self):
         return self._last_reset
 
+    @property
+    def icon(self):
+        return "mdi:water"
+
     def update(self, no_throttle=False):
         if not self.username:
             _LOGGER.warning(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.RED}Username is not set. Skipping update.{Colors.RESET}")
@@ -149,3 +153,11 @@ class WaterConsumptionSensor(WaterDataSensor):
     @property
     def device_class(self):
         return SensorDeviceClass.WATER
+
+    @property
+    def state_class(self):
+        return SensorStateClass.TOTAL_INCREASING
+
+    @property
+    def icon(self):
+        return "mdi:water"
