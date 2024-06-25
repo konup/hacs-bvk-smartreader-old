@@ -4,9 +4,9 @@ import json
 import datetime
 import os
 from datetime import timedelta, datetime as dt
-from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity, SensorDeviceClass, SensorStateClass
+from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorDeviceClass, SensorStateClass
 from homeassistant.const import UnitOfVolume
-from homeassistant.helpers.entity import Entity, DeviceInfo, EntityCategory
+from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 from homeassistant.core import HomeAssistant
 from .const import DOMAIN, CONF_USERNAME, CONF_PASSWORD, CONF_UPDATE_INTERVAL
@@ -14,7 +14,6 @@ from .const import DOMAIN, CONF_USERNAME, CONF_PASSWORD, CONF_UPDATE_INTERVAL
 # Ensure the logs directory exists
 os.makedirs('./custom_components/bvk_smartreader/logs', exist_ok=True)
 
-# ANSI escape codes for colored text
 class Colors:
     RED = 'ERROR '
     GREEN = 'SUCCESS '
@@ -42,7 +41,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     username = entry.data[CONF_USERNAME]
     password = entry.data[CONF_PASSWORD]
     update_interval = entry.data.get(CONF_UPDATE_INTERVAL, 8)
-    days = 1  # Default value or load from entry if set
+    days = 1
 
     water_consumption_sensor = WaterConsumptionSensor(hass, username, password, days, update_interval)
 
@@ -57,8 +56,6 @@ class WaterDataSensor(Entity):
         self.update_interval = timedelta(hours=update_interval)
         self._state = None
         self._attributes = {}
-        #self._unique_id = f"bvk_smartreader_{username}_{days}"
-        #self.entity_id = f"sensor.bvk_smartreader_{username}_{days}"
         self._unique_id = f"bvk_smartreader"
         self.entity_id = f"sensor.bvk_smartreader"
         self._last_reset = None
@@ -68,8 +65,7 @@ class WaterDataSensor(Entity):
 
     @property
     def name(self):
-        #return f"Water Data Sensor {self.username} {self.days}"
-        return f"Water Data Sensor"
+        return "Water Data Sensor"
 
     @property
     def state(self):
@@ -101,7 +97,7 @@ class WaterDataSensor(Entity):
 
     @property
     def icon(self):
-        return "mdi:water"
+        return "mdi:gauge"
 
     def update(self, no_throttle=False):
         if not self.username:
@@ -149,3 +145,4 @@ class WaterDataSensor(Entity):
 class WaterConsumptionSensor(WaterDataSensor):
     def __init__(self, hass, username, password, days, update_interval):
         super().__init__(hass, username, password, days, update_interval)
+
