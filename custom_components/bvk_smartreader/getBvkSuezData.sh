@@ -1,7 +1,5 @@
 #!/bin/bash
 
-verboseMode=$3
-[ "$verboseMode" == "1" ] || [ "$verboseMode" == "true" ] || [ "$verboseMode" == "enabled" ] && debug="1" || debug="0"
 cd custom_components/bvk_smartreader
 
 elog()
@@ -10,7 +8,6 @@ elog()
   DAT=`date "+%F %T"`
   TXT="$1"
   [ "$2" == "" ] && LEVEL="INFO" || LEVEL="$2"
-  [ "$debug" == "1" ] && echo "[$DAT] $LEVEL $0 ${TXT}"
   [ "$LOGF" == "" ] && export LOGF="logs/getBvkSuezData.log"
   echo "[$DAT] $LEVEL $0 ${TXT}" >> $LOGF
   [ "$3" != "" ] && { elog "STOP"; exit $3; }
@@ -304,7 +301,6 @@ rm -f ./cookie-*.txt
 
 elog "echo suezValue=${suezValue}"
 
-#echo "$suezValue"
 echo "[ { \"value\": $suezValue } ]"
 
 elog "finish"
