@@ -4,9 +4,9 @@ import json
 import datetime
 import os
 from datetime import timedelta, datetime as dt
-from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorDeviceClass, SensorStateClass
+from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity, SensorDeviceClass, SensorStateClass
 from homeassistant.const import UnitOfVolume
-from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity import Entity, DeviceInfo, EntityCategory
 from homeassistant.util import Throttle
 from homeassistant.core import HomeAssistant
 from .const import DOMAIN, CONF_USERNAME, CONF_PASSWORD, CONF_UPDATE_INTERVAL
@@ -135,7 +135,11 @@ class WaterDataSensor(Entity):
             self._state = total_value
             self._attributes = {
                 'data': data,
-                'last_update': dt.now().strftime("%Y-%m-%d %H:%M:%S")
+                'last_update': dt.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'unit_of_measurement': self.unit_of_measurement,
+                'device_class': self.device_class,
+                'state_class': self.state_class,
+                'icon': self.icon
             }
             self._last_reset = dt.now().replace(hour=0, minute=0, second=0, microsecond=0)
             _LOGGER.debug(dt.now().strftime("%Y-%m-%d %H:%M:%S") + f": {Colors.CYAN}Total value: {total_value}{Colors.RESET}")
